@@ -3,17 +3,22 @@
     <head>
         <meta charset="utf-8" />
         <title>CountDown Timer</title>
+        <style type="text/css">
+        .label {
+            width: 10px;
+        }
+        #remaining {
+            color: green;
+        }
+        </style>
     </head>
     <body>
-        <p>Current time: <span id="time"></span>
-
-        </p>
-        <input id="length"/>
-        <button id="start" onclick="startTimer()">Start</button>
-        <div>Start: <span id="starttime"></span>
-        </div>
-        <div id="endtime"></div>
-        <div id="remaining"></div>
+        <div style="font-size:200%"><span id="remaining"></span></div>
+        <div><span class="label">Time:</span> <span id="time"></span></div>
+        <div><span class="label">Start:</span> <span id="starttime"></span></div>
+        <div><span class="label">End:</span> <span id="endtime"></span></div>
+        <input id="length" style="width:100px"/> min<br> 
+        <button id="start" onclick="startTimer()">--- Start ---</button>
         <div id="current"></div>
         <div>
             <h1>About</h1>
@@ -32,7 +37,7 @@
         var endTime;
         var running = false;
         var sign = "&nbsp;";
-        var elTime
+        var elTime, elRemaining;
         
         function fm( num, places) {
                 // todo: negative values are not formatted correctly
@@ -50,25 +55,20 @@
         }
 
         function clock(){
-            var remaining;
             var now = moment();
             elTime.innerHTML = now.format("HH:mm:ss")
             if (running) {
-                //remaining = moment(endTime).subtract(moment());
-                remaining = moment.unix(moment(endTime).diff(moment(), "seconds"));
                 var dm = moment(endTime).diff( now, "seconds");
                 if (dm < 0) {
                         dm = now.diff( endTime, "seconds");
-                        //dm = dm * -1;
                         sign = "+";
-                        cls = "post"
                 }
                                 
                 var h = Math.floor(dm / 3600);
                 var m = Math.floor((dm - (h * 3600)) / 60);
                 var s = dm % 60;
 
-                document.getElementById("remaining").innerHTML = sign + fmTime( h, m, s);
+                elRemaining.innerHTML = sign + fmTime( h, m, s);
             }
         }
         
@@ -77,32 +77,36 @@
             endTime = moment(now).add(document.getElementById("length").value, "minutes").set("second", 59);
             document.getElementById("starttime").innerHTML = now.format("HH:mm:ss");
             document.getElementById("endtime").innerHTML = endTime.format("HH:mm:ss");
-            running=true;
+            running=true; 
             sign="&nbsp;";
             remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, running)
         }
-        
+
+        function stopTimer(){
+            running = false;
+            elTime = "--- stopped ---"
+        }        
         elTime = document.getElementById("time");
         elRemaining = document.getElementById("remaining");
         window.setInterval("clock()", 500);
     </script>
     <script>
-        RemoteStorage.config.logging = true;
+        // set this to true, to see logs
+        RemoteStorage.config.logging = false;
         RemoteStorage.config.changeEvents = {
           local: true,
           window: true,
           remote: true,
           conflict: true
         };
-    
-        function $(id) { return document.getElementById(id); }
-    
+
         function displayTimer( e){
-            $('current').innerHTML = JSON.stringify( e);
-            document.getElementById("starttime").innerHTML = e.newValue.starttime; //now.format("HH:mm:ss");
+            // uncomment, to show the event on the webpage
+            // document.getElementById('current').innerHTML = JSON.stringify( e);
+            document.getElementById("starttime").innerHTML = e.newValue.starttime; 
             document.getElementById("length").value = e.newValue.length;
+            document.getElementById("endtime").innerHTML = e.newValue.endtime; 
             endTime = moment(e.newValue.endtime, "HH:mm:ss");
-            document.getElementById("endtime").innerHTML = e.newValue.endtime; //endTime.format("HH:mm:ss");
             running = e.newValue.running;
         }
     
