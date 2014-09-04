@@ -4,9 +4,6 @@
         <meta charset="utf-8" />
         <title>CountDown Timer</title>
         <style type="text/css">
-        .label {
-            width: 10px;
-        }
         #remaining {
             color: green;
         }
@@ -14,10 +11,12 @@
     </head>
     <body>
         <div style="font-size:200%"><span id="remaining"></span></div>
-        <div><span class="label">Time:</span> <span id="time"></span></div>
-        <div><span class="label">Start:</span> <span id="starttime"></span></div>
-        <div><span class="label">End:</span> <span id="endtime"></span></div>
-        <input id="length" style="width:100px"/> min<br> 
+        <table>
+        <tr><td class="label">Time:</td> <td id="time"></td></tr>
+        <tr><td class="label">Start:</td> <td id="starttime"></td></tr>
+        <tr><td class="label">End:</td> <td id="endtime"></td></tr>
+        </table>
+        <input id="length" style="width: 70px"/> min<br> 
         <button id="start" onclick="startTimer()">--- Start ---</button>
         <div id="current"></div>
         <div>
@@ -77,8 +76,8 @@
             endTime = moment(now).add(document.getElementById("length").value, "minutes").set("second", 59);
             document.getElementById("starttime").innerHTML = now.format("HH:mm:ss");
             document.getElementById("endtime").innerHTML = endTime.format("HH:mm:ss");
-            running=true; 
-            sign="&nbsp;";
+            running = true; 
+            sign    = "&nbsp;&nbsp;";
             remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, running)
         }
 
@@ -86,6 +85,7 @@
             running = false;
             elTime = "--- stopped ---"
         }        
+        
         elTime = document.getElementById("time");
         elRemaining = document.getElementById("remaining");
         window.setInterval("clock()", 500);
