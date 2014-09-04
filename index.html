@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>rs.js starter-kit "hello world" example</title>
+    </head>
+    <body>
+        <p>Current time: <span id="time"></span>
+
+        </p>
+        <input id="length"/>
+        <button id="start" onclick="startTimer()">Start</button>
+        <div>Start: <span id="starttime"></span>
+        </div>
+        <div id="endtime"></div>
+        <div id="remaining"></div>
+        <div id="current"></div>
+    </body>
+    <script src="remotestorage.js"></script>
+    <script src="timer.js"></script>
+    <script src="moment.js"></script>
+    <script>
+        var endTime;
+        var running = false;
+        var sign = "&nbsp;";
+        var elTime
+        
+        function fm( num, places) {
+                // todo: negative values are not formatted correctly
+                //       same for decimals
+                if (!places) {places = 2};
+                var s = num.toString();
+                for (i = s.length ; i < places ; i++) {
+                        s = "0" + s
+                }
+                return s;
+        }
+        
+        function fmTime( h, m, s) {
+                return fm( h) + ":" + fm( m) + ":" + fm( s);
+        }
+
+        function clock(){
+            var remaining;
+            var now = moment();
+            elTime.innerHTML = now.format("HH:mm:ss")
+            if (running) {
+                //remaining = moment(endTime).subtract(moment());
+                remaining = moment.unix(moment(endTime).diff(moment(), "seconds"));
+                var dm = moment(endTime).diff( now, "seconds");
+                if (dm < 0) {
+                        dm = now.diff( endTime, "seconds");
+                        //dm = dm * -1;
+                        sign = "+";
+                        cls = "post"
+                }
+                                
+                var h = Math.floor(dm / 3600);
+                var m = Math.floor((dm - (h * 3600)) / 60);
+                var s = dm % 60;
+
+                document.getElementById("remaining").innerHTML = sign + fmTime( h, m, s);
+            }
+        }
+        
+        function startTimer(){
+            var now = moment()
+            endTime = moment(now).add(document.getElementById("length").value, "minutes").set("second", 59);
+            document.getElementById("starttime").innerHTML = now.format("HH:mm:ss");
+            document.getElementById("endtime").innerHTML = endTime.format("HH:mm:ss");
+            running=true;
+            sign="&nbsp;";
+            remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, true)
+        }
+        
+        elTime = document.getElementById("time");
+        elRemaining = document.getElementById("remaining");
+        window.setInterval("clock()", 500);
+    </script>
+    <script>
+        RemoteStorage.config.logging = true;
+        RemoteStorage.config.changeEvents = {
+          local: true,
+          window: true,
+          remote: true,
+          conflict: true
+        };
+    
+        function $(id) { return document.getElementById(id); }
+    
+        function displayTimer( e){
+            $('current').innerHTML = JSON.stringify( e);
+            document.getElementById("starttime").innerHTML = e.newValue.starttime; //now.format("HH:mm:ss");
+            document.getElementById("length").value = e.newValue.length;
+            endTime = moment(e.newValue.endtime, "HH:mm:ss");
+            document.getElementById("endtime").innerHTML = e.newValue.endtime; //endTime.format("HH:mm:ss");
+        }
+    
+        remoteStorage.access.claim('timer', 'rw');
+        remoteStorage.displayWidget();
+        remoteStorage.timer.onChange(displayTimer);
+    
+    </script>
+</html>
