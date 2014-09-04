@@ -79,7 +79,7 @@
             document.getElementById("endtime").innerHTML = endTime.format("HH:mm:ss");
             running=true;
             sign="&nbsp;";
-            remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, true)
+            remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, running)
         }
         
         elTime = document.getElementById("time");
@@ -103,6 +103,7 @@
             document.getElementById("length").value = e.newValue.length;
             endTime = moment(e.newValue.endtime, "HH:mm:ss");
             document.getElementById("endtime").innerHTML = e.newValue.endtime; //endTime.format("HH:mm:ss");
+            running = e.newValue.running;
         }
     
         remoteStorage.access.claim('timer', 'rw');
