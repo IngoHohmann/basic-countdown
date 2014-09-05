@@ -14,6 +14,6 @@ Real world use case
 
 Links
 -----
-* Simple-CountDown [Live Webpage](https://basic-countdown.5apps.com/) /
+* Basic-CountDown [Live Webpage](https://countdown.5apps.com/) /
 [App Downloads](https://5apps.com/ianus/countdwon)
 * [remote storage](http://remotestorage.io/)
