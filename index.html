@@ -28,6 +28,10 @@
             <p>Enjoy!</p>
             <p>P.S. This is beta software, it's working, no work on making it look nice has been done.</p>
         </div>
+		  <hr>
+		  <div>
+			<a href="https://github.com/IngoHohmann/basic-countdown">Source</a> / <a href="https://5apps.com/ianus/countdown">"Deployment options</a>
+		  </div>
     </body>
     <script src="remotestorage.js"></script>
     <script src="timer.js"></script>
@@ -39,18 +43,18 @@
         var elTime, elRemaining;
         
         function fm( num, places) {
-                // todo: negative values are not formatted correctly
-                //       same for decimals
-                if (!places) {places = 2};
-                var s = num.toString();
-                for (i = s.length ; i < places ; i++) {
-                        s = "0" + s
-                }
-                return s;
+            // todo: negative values are not formatted correctly
+            //       same for decimals
+            if (!places) {places = 2};
+            var s = num.toString();
+            for (i = s.length ; i < places ; i++) {
+                    s = "0" + s
+            }
+            return s;
         }
         
         function fmTime( h, m, s) {
-                return fm( h) + ":" + fm( m) + ":" + fm( s);
+            return fm( h) + ":" + fm( m) + ":" + fm( s);
         }
 
         function clock(){
@@ -59,8 +63,8 @@
             if (running) {
                 var dm = moment(endTime).diff( now, "seconds");
                 if (dm < 0) {
-                        dm = now.diff( endTime, "seconds");
-                        sign = "+";
+                    dm = now.diff( endTime, "seconds");
+                    sign = "+";
                 }
                                 
                 var h = Math.floor(dm / 3600);
