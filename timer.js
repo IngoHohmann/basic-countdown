@@ -18,15 +18,14 @@ RemoteStorage.defineModule('timer', function(privateClient, publicClient) {
         },
         required: ['starttime', 'length', 'running']
     });
-    var note, cb;
+    var cb;
     privateClient.on('change', function(e) {
-        console.log('change coming from ' + e.origin, JSON.stringify(e));
-        //if (e.relativePath == 'note.txt') {
-            note = e.newValue;
-            if (cb) {
-                cb(e);
-            }
-        //}
+        //uncomment to see more logs
+        //console.log('change coming from ' + e.origin, JSON.stringify(e));
+        //note = e.newValue;
+        if (cb) {
+            cb(e);
+        }
     });
     return {
         exports: {

@@ -7,19 +7,33 @@
         #remaining {
             color: green;
         }
+        #footer {
+            font-size: 6pt;
+        }
+        .hidden {
+            display: none;
+        }
+        #main {
+            width: 8em;
+        }
+        button {
+            width: 8em;
+        }
         </style>
     </head>
     <body>
-        <div style="font-size:200%"><span id="remaining"></span></div>
+        <div id="main">
+        <div style="font-size:200%"><span id="remaining">&nbsp;</span></div>
         <table>
         <tr><td class="label">Time:</td> <td id="time"></td></tr>
         <tr><td class="label">Start:</td> <td id="starttime"></td></tr>
         <tr><td class="label">End:</td> <td id="endtime"></td></tr>
         </table>
         <input id="length" style="width: 70px"/> min<br> 
-        <button id="start" onclick="startTimer()">--- Start ---</button>
+        <button id="start" onclick="toggleTimer()">--- Start ---</button>
+        <button id="continue" onclick="continueTimer()">continue</button>
         <div id="current"></div>
-        <div>
+        <div id="about" class="hidden">
             <h1>About</h1>
             <p>This is a small example app for remotestorage usage.</p>
             <p>Additionally I may use it to be able to track my breaks at work on my mobile phone.</p>
@@ -28,10 +42,11 @@
             <p>Enjoy!</p>
             <p>P.S. This is beta software, it's working, no work on making it look nice has been done.</p>
         </div>
-		  <hr>
-		  <div>
-			<a href="https://github.com/IngoHohmann/basic-countdown">Source</a> / <a href="https://5apps.com/ianus/countdown">Deployment options</a>
-		  </div>
+        <hr>
+        </div>
+		<div id="footer">
+			<a href="#" onclick="toggleAbout()">About</a> / <a href="https://github.com/IngoHohmann/basic-countdown">Source</a> / <a href="https://5apps.com/ianus/countdown">Deployment options</a>
+		</div>
     </body>
     <script src="remotestorage.js"></script>
     <script src="timer.js"></script>
@@ -41,7 +56,19 @@
         var running = false;
         var sign = "&nbsp;";
         var elTime, elRemaining;
+        var interval;
+        var d = document;
+        var about = false;
         
+        function toggleAbout(){
+            if (about) {
+                d.getElementById( "about").setAttribute( "class", "visible");
+            } else {
+                d.getElementById( "about").setAttribute( "class", "hidden");
+            }
+            about = !about;
+        }
+
         function fm( num, places) {
             // todo: negative values are not formatted correctly
             //       same for decimals
@@ -60,6 +87,7 @@
         function clock(){
             var now = moment();
             elTime.innerHTML = now.format("HH:mm:ss")
+
             if (running) {
                 var dm = moment(endTime).diff( now, "seconds");
                 if (dm < 0) {
@@ -75,24 +103,42 @@
             }
         }
         
-        function startTimer(){
+        function toggleTimer(){
             var now = moment()
-            endTime = moment(now).add(document.getElementById("length").value, "minutes").set("second", 59);
-            document.getElementById("starttime").innerHTML = now.format("HH:mm:ss");
-            document.getElementById("endtime").innerHTML = endTime.format("HH:mm:ss");
-            running = true; 
-            sign    = "&nbsp;&nbsp;";
-            remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, running)
+            if (!running) {
+                endTime = moment(now).add(document.getElementById("length").value, "minutes").set("second", 59);
+                d.getElementById("starttime").innerHTML = now.format("HH:mm:ss");
+                d.getElementById("endtime").innerHTML = endTime.format("HH:mm:ss");
+                sign    = "&nbsp;&nbsp;";
+                running = true; 
+                remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, running);
+                d.getElementById( "start").innerHTML = "--- Stop ---"
+            } else {
+                running = false;
+                elRemaining.innerHTML = "&nbsp;"
+                remoteStorage.timer.setTimer( d.getElementById("starttime").innerHTML, endTime.format("HH:mm:ss"), document.getElementById("length").value, running)
+                d.getElementById( "start").innerHTML = "--- Start ---"
+            }
         }
 
+        function continueTimer(){
+            running = true;
+            remoteStorage.timer.setTimer( d.getElementById("starttime").innerHTML, endTime.format("HH:mm:ss"), document.getElementById("length").value, running)
+            d.getElementById( "start").innerHTML = "--- Stop ---"
+        }
+        
+        function startTimer(){
+            stopTimer();
+            interval = window.setInterval( "clock()", 500);
+        }
+        
         function stopTimer(){
-            running = false;
-            elTime = "--- stopped ---"
+            window.clearInterval( interval)
         }        
         
         elTime = document.getElementById("time");
         elRemaining = document.getElementById("remaining");
-        window.setInterval("clock()", 500);
+        startTimer();
     </script>
     <script>
         // set this to true, to see logs
@@ -112,11 +158,16 @@
             document.getElementById("endtime").innerHTML = e.newValue.endtime; 
             endTime = moment(e.newValue.endtime, "HH:mm:ss");
             running = e.newValue.running;
+            document.getElementById( "start").innerHTML = (running) ? "--- Stop ---" : "--- Start ---";
+            if (running) {
+                document.getElementById( "continue").setAttribute( "class", "hidden");
+            } else {
+                document.getElementById( "continue").setAttribute( "class", "visible");
+            }
         }
     
         remoteStorage.access.claim('timer', 'rw');
         remoteStorage.displayWidget();
         remoteStorage.timer.onChange(displayTimer);
-    
     </script>
 </html>
