@@ -4,11 +4,17 @@
         <meta charset="utf-8" />
         <title>CountDown Timer</title>
         <style type="text/css">
-        #remaining {
+        .green {
             color: green;
         }
-        #footer {
-            font-size: 6pt;
+        .orange {
+            color: orange;
+        }
+        .red {
+            color: red;
+        }
+        .black {
+            color: black;
         }
         .hidden {
             display: none;
@@ -19,11 +25,14 @@
         button {
             width: 8em;
         }
+        #footer {
+            font-size: 6pt;
+        }
         </style>
     </head>
     <body>
         <div id="main">
-        <div style="font-size:200%"><span id="remaining">&nbsp;</span></div>
+        <div style="font-size:200%" ><span id="remaining">&nbsp;</span></div>
         <table>
         <tr><td class="label">Time:</td> <td id="time"></td></tr>
         <tr><td class="label">Start:</td> <td id="starttime"></td></tr>
@@ -31,7 +40,7 @@
         </table>
         <input id="length" style="width: 70px"/> min<br> 
         <button id="start" onclick="toggleTimer()">--- Start ---</button>
-        <button id="continue" onclick="continueTimer()">continue</button>
+        <button id="continue" onclick="continueTimer()" class="hidden">continue</button>
         <div id="current"></div>
         <div id="about" class="hidden">
             <h1>About</h1>
@@ -90,6 +99,14 @@
 
             if (running) {
                 var dm = moment(endTime).diff( now, "seconds");
+
+        		if (60 > dm) {
+        		    elRemaining.setAttribute( "class", "red" )
+        		} else if (120 > dm){
+        			elRemaining.setAttribute( "class", "orange" )
+        		} else if (0 > dm) {
+        			elRemaining.setAttribute( "class", "black" )
+        		}
                 if (dm < 0) {
                     dm = now.diff( endTime, "seconds");
                     sign = "+";
@@ -113,6 +130,7 @@
                 running = true; 
                 remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, running);
                 d.getElementById( "start").innerHTML = "--- Stop ---"
+			    elRemaining.setAttribute( "class", "green" )
             } else {
                 running = false;
                 elRemaining.innerHTML = "&nbsp;"
