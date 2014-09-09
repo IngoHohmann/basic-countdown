@@ -68,6 +68,7 @@
         var interval;
         var d = document;
         var about = false;
+        var state;
         
         function toggleAbout(){
             if (about) {
@@ -101,11 +102,20 @@
                 var dm = moment(endTime).diff( now, "seconds");
 
         		if (60 > dm) {
+        		    if ("red" != state) {
         		    elRemaining.setAttribute( "class", "red" )
+        		    state = "red";
+        		    }
         		} else if (120 > dm){
+        		    if ("orange" != state) {
         			elRemaining.setAttribute( "class", "orange" )
+        			state = "orange"
+        		    }
         		} else if (0 > dm) {
+        		    if ("black" != state) {
         			elRemaining.setAttribute( "class", "black" )
+        			state = "black"
+        		    }
         		}
                 if (dm < 0) {
                     dm = now.diff( endTime, "seconds");
@@ -131,6 +141,7 @@
                 remoteStorage.timer.setTimer( now.format("HH:mm:ss"), endTime.format("HH:mm:ss"), document.getElementById("length").value, running);
                 d.getElementById( "start").innerHTML = "--- Stop ---"
 			    elRemaining.setAttribute( "class", "green" )
+			    state = "green"
             } else {
                 running = false;
                 elRemaining.innerHTML = "&nbsp;"
@@ -171,6 +182,7 @@
         function displayTimer( e){
             // uncomment, to show the event on the webpage
             // document.getElementById('current').innerHTML = JSON.stringify( e);
+            var now = moment()
             document.getElementById("starttime").innerHTML = e.newValue.starttime; 
             document.getElementById("length").value = e.newValue.length;
             document.getElementById("endtime").innerHTML = e.newValue.endtime; 
